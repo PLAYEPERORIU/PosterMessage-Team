@@ -1,0 +1,38 @@
+name: 🔍 Documentation & Quality Check
+
+on:
+  push:
+    branches: [main, "arena/**"]
+  pull_request:
+    branches: [main]
+
+jobs:
+  validate-docs:
+    name: 📄 Validate Documentation & Links
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: 🛠️ Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: 🧪 Verify Required Files Exist
+        run: |
+          echo "Checking essential repository files..."
+          test -f README.md || (echo "Missing README.md" && exit 1)
+          test -f LICENSE || (echo "Missing LICENSE" && exit 1)
+          test -f CONTRIBUTING.md || (echo "Missing CONTRIBUTING.md" && exit 1)
+          test -f CODE_OF_CONDUCT.md || (echo "Missing CODE_OF_CONDUCT.md" && exit 1)
+          test -f SECURITY.md || (echo "Missing SECURITY.md" && exit 1)
+          test -f PROJECTS.md || (echo "Missing PROJECTS.md" && exit 1)
+          test -f PRIVILEGES.md || (echo "Missing PRIVILEGES.md" && exit 1)
+          echo "✅ All essential files are present."
+
+      - name: 🔍 Check Markdown Linting
+        run: |
+          npx --yes markdownlint-cli README.md PROJECTS.md PRIVILEGES.md CONTRIBUTING.md CODE_OF_CONDUCT.md SECURITY.md --disable MD013 MD033 MD041 || true
+          echo "✅ Markdown lint check complete."
